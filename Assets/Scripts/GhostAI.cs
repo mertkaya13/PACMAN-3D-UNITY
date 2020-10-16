@@ -20,6 +20,7 @@ public class GhostAI : MonoBehaviour
 
     void Start()
     {
+
         agent = GetComponent<NavMeshAgent>();
         goToNextPatrolPoint();
     }
@@ -28,17 +29,30 @@ public class GhostAI : MonoBehaviour
     //Is distance close enough to start chase?
     private void chaseControl()
     {
-        if (Vector3.Distance(ghost.position, target.position) < 8)
+
+        //Will calculate distance to Pacman using the offmesh links too.
+        //If distance is too far does not chase and continues to patrol
+        NavMeshPath calculatedPathToPacman = new NavMeshPath();
+        NavMesh.CalculatePath(ghost.position, target.position, NavMesh.AllAreas, calculatedPathToPacman);
+        NavMeshPath temp = agent.path;
+        agent.path = calculatedPathToPacman;
+
+        if ( agent.remainingDistance < 8)
         {
-            Debug.Log(Vector3.Distance(ghost.position, target.position));
+            //Debug.Log(Vector3.Distance(ghost.position, target.position));
             isOnChase = true;
         }
         else
         {
+            agent.path = temp;
             isOnChase = false;
         }
     }
 
+    private void Awake()
+    {
+
+    }
     private void goToNextPatrolPoint()
     {
 
